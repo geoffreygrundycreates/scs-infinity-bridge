@@ -1,0 +1,44 @@
+{
+  "version": "0.5.4-alpha",
+  "files_compared": [
+    "base-older",
+    "base-untouched",
+    "upstream",
+    "working-v3"
+  ],
+  "source_tests": {
+    "base-older": {
+      "exact_source_occurrences_targeted": 68,
+      "remnant_raw_labels": [],
+      "target_expressions_present": 55
+    },
+    "base-untouched": {
+      "exact_source_occurrences_targeted": 63,
+      "remnant_raw_labels": [],
+      "target_expressions_present": 17
+    },
+    "upstream": {
+      "exact_source_occurrences_targeted": 68,
+      "remnant_raw_labels": [],
+      "target_expressions_present": 55
+    },
+    "working-v3": {
+      "exact_source_occurrences_targeted": 12,
+      "remnant_raw_labels": [],
+      "target_expressions_present": 55
+    }
+  },
+  "exact_match_rules": 66,
+  "validated": [
+    "class label raw + SCS wrapped expressions",
+    "no changes to example unrelated UI labels",
+    "separate installer components retained",
+    "SCS filter does not remove adjacent unrelated braces"
+  ],
+  "not_validated": [
+    "WeiDU execution",
+    "BGEE runtime",
+    "all SCS startup-corruption variants",
+    "five-point thief level-up lifecycle"
+  ]
+}

@@ -1,0 +1,412 @@
+BACKUP ~scs-infinity-bridge/backup~
+AUTHOR ~Infinity UI / SCS compatibility contributors~
+VERSION ~0.5.4-alpha~
+
+// All components independent; no auto-install of SCS features.
+// SCS install detection reads the standard WeiDU.log; no fixed version dependency.
+// Install after both mods and after other UI-changing mods.
+
+BEGIN ~Class/kit labels and character record levels (working-v3-derived)~
+DESIGNATED 0
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~infinity_ui/infinity_ui.tp2~ 0) ~Requires Infinity UI++ core.~
+REQUIRE_PREDICATE (FILE_CONTAINS ~WeiDU.log~ ~STRATAGEMS/SETUP-STRATAGEMS[.]TP2~) ~Requires an installed SCS component.~
+
+COPY_EXISTING ~UI.menu~ ~override~
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~listMetaInfo = {}~) < 0 BEGIN
+    PATCH_FAIL ~Unknown UI.menu: Infinity UI++ entry point not found; refusing edits.~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~function rgCleanSCSClassLabel(~) < 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~listMetaInfo = {}~ ~-- SCS class labels: presentation only. No changes to the TLK or gameplay.%WNL%function rgCleanSCSClassLabel(value)%WNL%    if type(value) == "string" then%WNL%        local p = string.char(37)%WNL%        local pattern = p.."s*"..p.."{[Kk]"..p.."s*="..p.."s*"..p.."d+"..p.."s*,"..p.."s*[Cc]"..p.."s*="..p.."s*"..p.."d+"..p.."s*}"%WNL%        return (value:gsub(pattern, ""))%WNL%    end%WNL%    return value%WNL%end%WNL%%WNL%listMetaInfo = {}~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		table.insert(listItems, { 'rgempty','0', characters[currentID].classlevel.first.details .. '\n' })~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		table.insert(listItems, { 'rgempty','0', characters[currentID].classlevel.first.details .. '\n' })~ ~		table.insert(listItems, { 'rgempty','0', rgCleanSCSClassLabel(characters[currentID].classlevel.first.details) .. '\n' })~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~			table.insert(listItems, { 'rgempty','0', characters[currentID].classlevel.second.details .. '\n'})~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~			table.insert(listItems, { 'rgempty','0', characters[currentID].classlevel.second.details .. '\n'})~ ~			table.insert(listItems, { 'rgempty','0', rgCleanSCSClassLabel(characters[currentID].classlevel.second.details) .. '\n'})~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~			table.insert(listItems, { 'rgempty','0', characters[currentID].classlevel.third.details .. '\n'})~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~			table.insert(listItems, { 'rgempty','0', characters[currentID].classlevel.third.details .. '\n'})~ ~			table.insert(listItems, { 'rgempty','0', rgCleanSCSClassLabel(characters[currentID].classlevel.third.details) .. '\n'})~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~	out = out .. '\n\n' .. characters[currentID].kitDesc%WNL%%WNL%	return out~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~	out = out .. '\n\n' .. characters[currentID].kitDesc%WNL%%WNL%	return out~ ~	out = out .. '\n\n' .. characters[currentID].kitDesc%WNL%%WNL%	return rgCleanSCSClassLabel(out)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~	return char.name .. ' - ' .. char.class .. ""~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~	return char.name .. ' - ' .. char.class .. ""~ ~	return char.name .. ' - ' .. rgCleanSCSClassLabel(char.class) .. ""~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.first.details~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.first.details~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[currentID].classlevel.first.details)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.first.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.first.details, '%d.')~ ~		rgLevel = string.match(rgCleanSCSClassLabel(characters[currentID].classlevel.first.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.second.details~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.second.details~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[currentID].classlevel.second.details)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.second.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.second.details, '%d.')~ ~		rgLevel = string.match(rgCleanSCSClassLabel(characters[currentID].classlevel.second.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.third.details ~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.third.details ~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[currentID].classlevel.third.details) ~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.third.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.third.details, '%d.')~ ~		rgLevel = string.match(rgCleanSCSClassLabel(characters[currentID].classlevel.third.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.first.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.first.details, '%d.')~ ~		rgLevel = string.match(rgCleanSCSClassLabel(characters[currentID].classlevel.first.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.second.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.second.details, '%d.')~ ~		rgLevel = string.match(rgCleanSCSClassLabel(characters[currentID].classlevel.second.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.third.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgLevel = string.match(characters[currentID].classlevel.third.details, '%d.')~ ~		rgLevel = string.match(rgCleanSCSClassLabel(characters[currentID].classlevel.third.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.first.details~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.first.details~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[currentID].classlevel.first.details)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.second.details~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.second.details~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[currentID].classlevel.second.details)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.third.details~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[currentID].classlevel.third.details~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[currentID].classlevel.third.details)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[rgInvId].classlevel.first.details~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[rgInvId].classlevel.first.details~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[rgInvId].classlevel.first.details)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[rgInvId].classlevel.second.details~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[rgInvId].classlevel.second.details~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[rgInvId].classlevel.second.details)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		rgClass = ',' .. characters[rgInvId].classlevel.third.details ~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		rgClass = ',' .. characters[rgInvId].classlevel.third.details ~ ~		rgClass = ',' .. rgCleanSCSClassLabel(characters[rgInvId].classlevel.third.details) ~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		text lua "rgString(characters[rgInvId].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		text lua "rgString(characters[rgInvId].class)"~ ~		text lua "rgCleanSCSClassLabel(rgString(characters[rgInvId].class))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~ ~				text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.class[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~ ~				text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.class[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.kit[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.kit[rowNumber].name)"~ ~				text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.kit[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~ ~				text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.class[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.kit[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~				text lua "Infinity_FetchString(chargen.kit[rowNumber].name)"~ ~				text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.kit[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~	--	text lua  "getUiString('LEVEL_UP_TITLE') .. ' - ' ..  characters[currentID].name .. ', ' .. characters[currentID].class"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~	--	text lua  "getUiString('LEVEL_UP_TITLE') .. ' - ' ..  characters[currentID].name .. ', ' .. characters[currentID].class"~ ~	--	text lua  "getUiString('LEVEL_UP_TITLE') .. ' - ' ..  characters[currentID].name .. ', ' .. rgCleanSCSClassLabel(characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		text lua "characters[currentID].name .. ', ' .. characters[currentID].class"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		text lua "characters[currentID].name .. ', ' .. characters[currentID].class"~ ~		text lua "characters[currentID].name .. ', ' .. rgCleanSCSClassLabel(characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~		text lua "characters[currentID].class"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~		text lua "characters[currentID].class"~ ~		text lua "rgCleanSCSClassLabel(characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(Infinity_FetchString(chargen.class[rowNumber].name))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(Infinity_FetchString(chargen.class[rowNumber].name))"~ ~text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.class[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(Infinity_FetchString(chargen.kit[rowNumber].name))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(Infinity_FetchString(chargen.kit[rowNumber].name))"~ ~text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.kit[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(characters[currentID].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(characters[currentID].class)"~ ~text lua "rgCleanSCSClassLabel(characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(characters[id].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(characters[id].class)"~ ~text lua "rgCleanSCSClassLabel(characters[id].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(characters[rgInvId].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(characters[rgInvId].class)"~ ~text lua "rgCleanSCSClassLabel(characters[rgInvId].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~) >= 0 BEGIN
+    PATCH_FAIL ~Class list left unfiltered: unsupported menu variant. Changes rolled back.~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "Infinity_FetchString(chargen.kit[rowNumber].name)"~) >= 0 BEGIN
+    PATCH_FAIL ~Kit list left unfiltered: unsupported menu variant. Changes rolled back.~
+  END
+  // Additional class displays missed by v0.5.3. Match complete expressions only.
+  // These are presentation paths, not the engine's class/kit or level-up data.
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(chargen.information)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(chargen.information)"~ ~text lua "rgCleanSCSClassLabel(chargen.information)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "chargen.information"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "chargen.information"~ ~text lua "rgCleanSCSClassLabel(chargen.information)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(1))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(1))"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(1))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "rgGetChargenInfo(1)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "rgGetChargenInfo(1)"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(1))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(2))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(2))"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(2))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "rgGetChargenInfo(2)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "rgGetChargenInfo(2)"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(2))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(3))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(3))"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(3))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "rgGetChargenInfo(3)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "rgGetChargenInfo(3)"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(3))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(4))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(rgGetChargenInfo(4))"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(4))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "rgGetChargenInfo(4)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "rgGetChargenInfo(4)"~ ~text lua "rgCleanSCSClassLabel(rgGetChargenInfo(4))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(character_select[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(character_select[rowNumber].name)"~ ~text lua "rgCleanSCSClassLabel(character_select[rowNumber].name)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "character_select[rowNumber].name"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "character_select[rowNumber].name"~ ~text lua "rgCleanSCSClassLabel(character_select[rowNumber].name)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(characters[rgInvId].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(characters[rgInvId].class)"~ ~text lua "rgCleanSCSClassLabel(characters[rgInvId].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "characters[rgInvId].class"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "characters[rgInvId].class"~ ~text lua "rgCleanSCSClassLabel(characters[rgInvId].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(rgString(characters[rgInvId].class))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(rgString(characters[rgInvId].class))"~ ~text lua "rgCleanSCSClassLabel(rgString(characters[rgInvId].class))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "rgString(characters[rgInvId].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "rgString(characters[rgInvId].class)"~ ~text lua "rgCleanSCSClassLabel(rgString(characters[rgInvId].class))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(characters[id].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(characters[id].class)"~ ~text lua "rgCleanSCSClassLabel(characters[id].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "characters[id].class"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "characters[id].class"~ ~text lua "rgCleanSCSClassLabel(characters[id].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "rgString(dwFilterKitDesc(characters[rgInvId].class))"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "rgString(dwFilterKitDesc(characters[rgInvId].class))"~ ~text lua "rgCleanSCSClassLabel(rgString(characters[rgInvId].class))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(characters[currentID].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(characters[currentID].class)"~ ~text lua "rgCleanSCSClassLabel(characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(characters[currentID].name .. ', ' .. characters[currentID].class)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(characters[currentID].name .. ', ' .. characters[currentID].class)"~ ~text lua "rgCleanSCSClassLabel(characters[currentID].name .. ', ' .. characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "characters[currentID].class"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "characters[currentID].class"~ ~text lua "rgCleanSCSClassLabel(characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "Infinity_FetchString(chargen.class[rowNumber].name)"~ ~text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.class[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "Infinity_FetchString(chargen.kit[rowNumber].name)"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "Infinity_FetchString(chargen.kit[rowNumber].name)"~ ~text lua "rgCleanSCSClassLabel(Infinity_FetchString(chargen.kit[rowNumber].name))"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "characters[currentID].name .. ', ' .. characters[currentID].class"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "characters[currentID].name .. ', ' .. characters[currentID].class"~ ~text lua "rgCleanSCSClassLabel(characters[currentID].name .. ', ' .. characters[currentID].class)"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~Infinity_FetchString(char.race) .. "\n" .. char.class .. "\n" .. Infinity_FetchString(char.alignment)~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~Infinity_FetchString(char.race) .. "\n" .. char.class .. "\n" .. Infinity_FetchString(char.alignment)~ ~Infinity_FetchString(char.race) .. "\n" .. rgCleanSCSClassLabel(char.class) .. "\n" .. Infinity_FetchString(char.alignment)~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~string.match(characters[id].classlevel.first.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~string.match(characters[id].classlevel.first.details, '%d.')~ ~string.match(rgCleanSCSClassLabel(characters[id].classlevel.first.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~string.match(characters[id].classlevel.second.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~string.match(characters[id].classlevel.second.details, '%d.')~ ~string.match(rgCleanSCSClassLabel(characters[id].classlevel.second.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~string.match(characters[id].classlevel.third.details, '%d.')~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~string.match(characters[id].classlevel.third.details, '%d.')~ ~string.match(rgCleanSCSClassLabel(characters[id].classlevel.third.details), '%d.')~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(classOrGeneralHelp())"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(classOrGeneralHelp())"~ ~text lua "rgCleanSCSClassLabel(classOrGeneralHelp())"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(rgKitOrAlignmentDesc())"~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~text lua "dwFilterKitDesc(rgKitOrAlignmentDesc())"~ ~text lua "rgCleanSCSClassLabel(rgKitOrAlignmentDesc())"~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "chargen.information"~) >= 0 BEGIN
+    PATCH_FAIL ~Unfiltered main character-creation information remains.~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "characters[rgInvId].class"~) >= 0 BEGIN
+    PATCH_FAIL ~Unfiltered inventory class label remains.~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "rgString(characters[rgInvId].class)"~) >= 0 BEGIN
+    PATCH_FAIL ~Unfiltered inventory class label remains.~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~text lua "dwFilterKitDesc(chargen.information)"~) >= 0 BEGIN
+    PATCH_FAIL ~Main character-creation class still relies on broad SCS filter.~
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+// The optional missing localisation helper is separate. Never alter t() on
+// installations where Infinity UI++ already provides it.
+BEGIN ~Restore missing Infinity UI++ localisation helper only if absent~
+DESIGNATED 5
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~infinity_ui/infinity_ui.tp2~ 0) ~Requires Infinity UI++ core.~
+REQUIRE_PREDICATE (FILE_CONTAINS ~WeiDU.log~ ~STRATAGEMS/SETUP-STRATAGEMS[.]TP2~) ~Requires SCS.~
+COPY_EXISTING ~UI.menu~ ~override~
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~function t(p)~) < 0 BEGIN
+    PATCH_IF INDEX_BUFFER (EXACT_MATCH ~listMetaInfo = {}~) < 0 BEGIN
+      PATCH_FAIL ~Unsupported UI.menu: cannot insert localisation helper.~
+    END
+    REPLACE_TEXTUALLY EXACT_MATCH ~listMetaInfo = {}~ ~function t(p)%WNL%    return getUiString(p)%WNL%end%WNL%%WNL%listMetaInfo = {}~
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+BEGIN ~Restrict existing SCS class text filter to SCS metadata only~
+DESIGNATED 15
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~infinity_ui/infinity_ui.tp2~ 0) ~Requires Infinity UI++ core.~
+REQUIRE_PREDICATE (FILE_CONTAINS ~WeiDU.log~ ~STRATAGEMS/SETUP-STRATAGEMS[.]TP2~) ~Requires SCS.~
+REQUIRE_PREDICATE (FILE_EXISTS_IN_GAME ~M_DW_DKF.lua~) ~SCS class metadata filter is absent.~
+COPY_EXISTING ~M_DW_DKF.lua~ ~override~
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~local ret=string.gsub(str,"{[^}]*}","")~) >= 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~local ret=string.gsub(str,"{[^}]*}","")~ ~local p=string.char(37)%WNL%        local ret=string.gsub(str,"{[Kk]="..p.."d+,"..p.."s*[Cc]="..p.."d+}","")~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~local ret=string.gsub(str,"{[^}]*}","")~) >= 0 BEGIN
+    PATCH_FAIL ~Unsafe original SCS filter still present; no change saved.~
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+BEGIN ~SCS startup onOpen recovery (isolated, fail-closed)~
+DESIGNATED 10
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~infinity_ui/infinity_ui.tp2~ 0) ~Requires Infinity UI++ core.~
+REQUIRE_PREDICATE (FILE_CONTAINS ~WeiDU.log~ ~STRATAGEMS/SETUP-STRATAGEMS[.]TP2~) ~Requires SCS.~
+REQUIRE_PREDICATE (FILE_EXISTS_IN_GAME ~M_DW_OOD.lua~) ~SCS onOpen runtime is absent.~
+// Does not alter UI.menu or remove valid named handlers. Repairs are restricted to
+// recognisable corruption; unexpected forms abort rather than deleting code.
+INCLUDE ~stratagems/sfo2e/lib_ui.tph~
+COPY_EXISTING ~M_DW_OOD.lua~ ~override~
+  SET cursor = INDEX_BUFFER (EXACT_MATCH ~dwOnOpenDefault['~)
+  // Raw menu markup inside a Lua handler is evidence of SCS's known overmatch.
+  // Recover only complete named handlers using the upstream menu's onOpen body.
+  WHILE cursor >= 0 BEGIN
+    SET following = INDEX_BUFFER (EXACT_MATCH ~dwOnOpenDefault['~ cursor + 1)
+    PATCH_IF following < 0 BEGIN SET following = BUFFER_LENGTH END
+    READ_ASCII cursor fragment (following - cursor)
+    SET damaged = 0
+    SPRINT menu_name ""
+    INNER_PATCH_SAVE probe ~%fragment%~ BEGIN
+      PATCH_IF INDEX_BUFFER (~^[ %TAB%]*}[%WNL%%LNL%%MNL%][ %TAB%]*label[%WNL%%LNL%%MNL%][ %TAB%]*{~) >= 0 BEGIN
+        SET damaged = 1
+        REPLACE_EVALUATE ~dwOnOpenDefault\['\([^']+\)'\]=function()~ BEGIN
+          SPRINT menu_name ~%MATCH1%~
+        END ~dwOnOpenDefault['%MATCH1%']=function()~
+      END
+    END
+    PATCH_IF damaged BEGIN
+      INNER_PATCH_SAVE validated ~%fragment%~ BEGIN
+        PATCH_IF INDEX_BUFFER (~end[ %TAB%%WNL%%LNL%%MNL%]*$~) < 0 BEGIN
+          PATCH_FAIL ~Damaged handler has unexpected trailing code; refusing replacement.~
+        END
+      END
+      PATCH_IF ~%menu_name%~ STR_EQ ~~ BEGIN
+        PATCH_FAIL ~Corrupted handler has no identifiable menu; refusing to guess.~
+      END
+      SPRINT recovered_body ""
+      SPRINT source_menu ""
+      INNER_ACTION BEGIN
+        COPY - ~infinity_ui/content/UI.MENU~ nowhere
+          LPF UI_return_object STR_VAR object=menu_name object_type=menu RET object_data END
+          SPRINT source_menu ~%object_data%~
+          INNER_PATCH_SAVE parsed ~%object_data%~ BEGIN
+            REPLACE_EVALUATE CASE_INSENSITIVE ~onopen[ %TAB%]*"\([^"]*\)"~ BEGIN
+              SPRINT recovered_body ~%MATCH1%~
+            END ~onOpen "%MATCH1%"~
+          END
+        BUT_ONLY
+      END
+      PATCH_IF ~%source_menu%~ STR_EQ ~~ BEGIN
+        PATCH_FAIL ~Cannot find damaged menu in Infinity UI++ source; no changes applied.~
+      END
+      PATCH_IF INDEX_BUFFER (~on[Oo]pen~) >= 0 AND ~%recovered_body%~ STR_EQ ~~ BEGIN
+        PATCH_FAIL ~Could not extract the original onOpen body; refusing to discard it.~
+      END
+      SPRINT repaired ~dwOnOpenDefault['%menu_name%']=function()%WNL%%recovered_body%%WNL%end%WNL%%WNL%~
+      DELETE_BYTES cursor (following-cursor)
+      INSERT_BYTES cursor (STRING_LENGTH ~%repaired%~)
+      WRITE_ASCIIE cursor ~%repaired%~
+      SET cursor = cursor + STRING_LENGTH ~%repaired%~
+    END ELSE BEGIN
+      SET cursor = following
+    END
+    SET cursor = INDEX_BUFFER (EXACT_MATCH ~dwOnOpenDefault['~ cursor)
+  END
+  PATCH_IF INDEX_BUFFER (~^[ %TAB%]*label[%WNL%%LNL%%MNL%][ %TAB%]*{~) >= 0 BEGIN
+    PATCH_FAIL ~Unrecognised damaged onOpen content; refusing destructive repair.~
+  END
+BUT_ONLY_IF_IT_CHANGES
+
+BEGIN ~SCS five-point thief-skill UI compatibility (#4115 only)~
+DESIGNATED 20
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~infinity_ui/infinity_ui.tp2~ 0) ~Requires Infinity UI++ core.~
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~stratagems/setup-stratagems.tp2~ 4115) ~Requires SCS component 4115.~
+REQUIRE_PREDICATE (FILE_EXISTS_IN_GAME ~M_DW_TSF.lua~) ~Missing SCS thief functions.~
+REQUIRE_PREDICATE (FILE_EXISTS_IN_GAME ~M_DW_TSD.lua~) ~Missing SCS thief definitions.~
+INCLUDE ~stratagems/sfo2e/lib_ui.tph~
+
+DEFINE_PATCH_FUNCTION iscb_skill_fields BEGIN
+  // Edit within one named menu only. Do not alter every Done/Cancel in the UI.
+  REPLACE_TEXTUALLY EXACT_MATCH ~dw_can_press_thief_button()~ ~iscbThiefClickable()~
+  REPLACE_TEXTUALLY EXACT_MATCH ~createCharScreen:IsThiefSkillPlusMinusButtonClickable()~ ~iscbThiefClickable()~
+  REPLACE_TEXTUALLY EXACT_MATCH ~dw_thiefskill_add(currentChargenThiefSkill)~ ~iscbThiefChange(true)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~dw_thiefskill_subtract(currentChargenThiefSkill)~ ~iscbThiefChange(false)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~createCharScreen:OnThiefSkillPlusMinusButtonClick(chargen.thief_skill[currentChargenThiefSkill].id, true)~ ~iscbThiefChange(true)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~createCharScreen:OnThiefSkillPlusMinusButtonClick(chargen.thief_skill[currentChargenThiefSkill].id, false)~ ~iscbThiefChange(false)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~dw_thiefskill_value(rowNumber)~ ~iscbThiefValue(rowNumber)~
+  REPLACE_TEXTUALLY EXACT_MATCH ~text lua "chargen.thief_skill[rowNumber].value"~ ~text lua "iscbThiefValue(rowNumber)"~
+  REPLACE_TEXTUALLY EXACT_MATCH ~dw_thiefskill_extra_points()~ ~iscbThiefRemaining()~
+  REPLACE_TEXTUALLY EXACT_MATCH ~text lua "chargen.extraSkillPoints"~ ~text lua "iscbThiefRemaining()"~
+  REPLACE_TEXTUALLY EXACT_MATCH ~dw_thief_skills_finished()~ ~iscbThiefDoneEnabled()~
+  REPLACE_TEXTUALLY EXACT_MATCH ~clickable lua "createCharScreen:IsDoneButtonClickable()"~ ~clickable lua "iscbThiefDoneEnabled()"~
+  REPLACE_TEXTUALLY EXACT_MATCH ~rgString('SKILLS_LABEL') .. ': ' .. chargen.extraSkillPoints~ ~rgString('SKILLS_LABEL') .. ': ' .. iscbThiefRemaining()~
+  // Exact button actions only within the two thief menu definitions.
+  REPLACE_TEXTUALLY EXACT_MATCH ~createCharScreen:OnDoneButtonClick()~ ~iscbThiefDone()~
+  REPLACE_TEXTUALLY EXACT_MATCH ~createCharScreen:OnCancelButtonClick()~ ~iscbThiefCancel()~
+END
+DEFINE_PATCH_FUNCTION iscb_skill_chargen BEGIN
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~table "chargen.thief_skill"~) >= 0 BEGIN
+    LPF iscb_skill_fields END
+    REPLACE_TEXTUALLY EXACT_MATCH ~rgGetProficiencyElementsArea()~ ~rgGetProficiencyElementsArea(); iscbThiefBegin()~
+    REPLACE_TEXTUALLY EXACT_MATCH ~dwOnOpen('CHARGEN_PROFICIENCIES')~ ~dwOnOpen('CHARGEN_PROFICIENCIES'); iscbThiefBegin()~
+    PATCH_IF INDEX_BUFFER (EXACT_MATCH ~iscbThiefBegin()~) < 0 BEGIN
+      PATCH_FAIL ~No thief character creation initialization hook found.~
+    END
+  END
+END
+DEFINE_PATCH_FUNCTION iscb_skill_levelup BEGIN
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~table "chargen.thief_skill"~) >= 0 BEGIN
+    LPF iscb_skill_fields END
+    REPLACE_TEXTUALLY EXACT_MATCH ~rgGetLvlUpArea()~ ~rgGetLvlUpArea(); iscbThiefBegin()~
+    REPLACE_TEXTUALLY EXACT_MATCH ~dwOnOpen('LEVELUP_PROFICIENCIES')~ ~dwOnOpen('LEVELUP_PROFICIENCIES'); iscbThiefBegin()~
+    PATCH_IF INDEX_BUFFER (EXACT_MATCH ~iscbThiefBegin()~) < 0 BEGIN
+      PATCH_FAIL ~No thief level-up initialization hook found.~
+    END
+  END
+END
+COPY ~scs-infinity-bridge/M_ISBT.lua~ ~override/M_ISBT.lua~
+COPY_EXISTING ~UI.menu~ ~override~
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~listMetaInfo = {}~) < 0 BEGIN
+    PATCH_FAIL ~Unknown Infinity UI++ entry point; thief UI unchanged.~
+  END
+  PATCH_IF INDEX_BUFFER (EXACT_MATCH ~Infinity_DoFile("M_ISBT")~) < 0 BEGIN
+    REPLACE_TEXTUALLY EXACT_MATCH ~listMetaInfo = {}~ ~Infinity_DoFile("M_ISBT")%WNL%listMetaInfo = {}~
+  END
+  LPF UI_alter_object STR_VAR object=CHARGEN_PROFICIENCIES object_type=menu patch=iscb_skill_chargen END
+  LPF UI_alter_object STR_VAR object=LEVELUP_PROFICIENCIES object_type=menu patch=iscb_skill_levelup END
+BUT_ONLY_IF_IT_CHANGES
+
+BEGIN ~SCS revised resting UI compatibility (#4135 only)~
+DESIGNATED 30
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~infinity_ui/infinity_ui.tp2~ 0) ~Requires Infinity UI++ core.~
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~stratagems/setup-stratagems.tp2~ 4135) ~Requires SCS component 4135.~
+REQUIRE_PREDICATE (FILE_EXISTS_IN_GAME ~M_DW_CMF.lua~) ~Missing SCS camping functions.~
+COPY_EXISTING ~UI.menu~ ~override~
+  REPLACE_TEXTUALLY EXACT_MATCH ~e:GetActiveEngine():OnRestButtonClick()~ ~dwRestButtonClicked()~
+  REPLACE_TEXTUALLY EXACT_MATCH ~tooltip lua "getTooltipWithHotkey(31,rgGetGameEngineStringRef(11942,11942,11942,11942))"~ ~tooltip lua "getTooltipWithHotkey(31,dwFindRestTooltipStrref())"~
+BUT_ONLY_IF_IT_CHANGES
+
+BEGIN ~SCS revised inn rooms UI compatibility (#4140 only)~
+DESIGNATED 40
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~infinity_ui/infinity_ui.tp2~ 0) ~Requires Infinity UI++ core.~
+REQUIRE_PREDICATE (MOD_IS_INSTALLED ~stratagems/setup-stratagems.tp2~ 4140) ~Requires SCS component 4140.~
+REQUIRE_PREDICATE (FILE_EXISTS_IN_GAME ~M_DW_ILF.lua~) ~Missing SCS inn functions.~
+COPY_EXISTING ~UI.menu~ ~override~
+  REPLACE_TEXTUALLY EXACT_MATCH ~storeScreen:OnRentRoomButtonClick()~ ~dwOnRentRoomButtonClick()~
+BUT_ONLY_IF_IT_CHANGES
