@@ -1,39 +1,43 @@
-# SCS × Infinity UI++ Compatibility Bridge — v0.5.4 Alpha
+# SCS × Infinity UI++ Compatibility Bridge
 
-## Included
+A lightweight WeiDU mod that addresses interface conflicts between **Sword Coast Stratagems (SCS)** and **Infinity UI++**. It patches the existing interface rather than replacing it. Each fix can be installed or uninstalled separately.
 
-Each WeiDU component can be installed or uninstalled independently.
+## What it fixes
 
-| ID | Feature | Condition |
-|---|---|---|
-| 0 | Class and kit code filtering in character creation, inventory, character selection, record screens, and applicable class/level displays | Infinity UI++ and SCS installed |
-| 5 | Missing `t()` localisation fallback | `t()` absent |
-| 10 | Conservative recovery of recognised SCS `M_DW_OOD.lua` onOpen corruption (experimental) | SCS onOpen runtime present |
-| 15 | Narrow SCS filtering to `{K=...,C=...}` metadata, preserving unrelated `{...}` | SCS class filter runtime present |
-| 20 | Five-point thief-skill controls, completion, and cancellation integration (experimental) | SCS #4115 installed |
-| 30 | Revised resting UI integration | SCS #4135 installed |
-| 40 | Revised inn-room UI integration | SCS #4140 installed |
+| Component | Fix |
+|---|---|
+| **0 — Class and kit names** | Hides SCS's `{K=...,C=...}` codes in supported character-creation, character-selection, inventory, character-record and class/level displays. |
+| **5 — Missing UI text** | Restores Infinity UI++'s missing localisation helper on layouts where it is absent. |
+| **10 — Startup errors** | Attempts to repair *recognisable* SCS-generated `M_DW_OOD.lua` / `onOpen` corruption without discarding valid handlers. **Experimental.** |
+| **15 — Text filtering** | Prevents SCS's class-name filter from also removing unrelated text inside `{braces}`. |
+| **20 — Five-point thief skills** | When SCS component **#4115** is installed, connects its five-point thief-skill allocation to Infinity UI++'s character-creation and level-up controls. **Experimental.** |
+| **30 — Revised resting** | Integrates SCS's revised resting controls when SCS component **#4135** is installed. |
+| **40 — Revised inns** | Integrates SCS's revised inn-room controls when SCS component **#4140** is installed. |
 
-## Not included
+The bridge does **not** enable optional SCS features you have not installed. It does not alter SCS combat AI or game rules.
 
-- SCS difficulty fine-tuning UI.
-- NPC Customisation & Management (#4100).
-- IWD spell additions and unrelated spell-system character-creation fixes.
-- Unrecognised malformed startup Lua or integration with arbitrary third-party UI mods.
-- A guarantee of compatibility with every future mod: runtime testing remains necessary.
+## What it does not fix
 
-## Requirements
+- **SCS NPC Customisation & Management (#4100):** Character-creation compatibility is not addressed. **Avoid installing this SCS component if you want to minimise known UI conflicts.**
+- **Icewind Dale spell additions:** Reported character-creation conflicts are not addressed. These are not confirmed in every setup; for a cautious installation, leave the relevant SCS spell additions disabled.
+- **SCS difficulty fine-tuning interface:** Not modified by this bridge.
+- **Every possible startup failure:** Component 10 cannot repair all malformed `M_DW_OOD.lua` handlers, including some unnamed-handler corruption.
+- **Every other UI mod:** Other interface replacements or custom layouts are not guaranteed to work with this bridge.
 
-- BGEE, BG2EE, EET or other supported Enhanced Edition game with both Infinity UI++ and SCS installed.
-- A WeiDU installer named `setup-scs-infinity-bridge` (`.exe` on Windows).
+Components **10** and **20** still require broader in-game testing. Install them separately so that any problems can be traced to a particular component.
 
-## Installation
+## Requirements and installation
 
-1. Install Infinity UI++, then SCS.
-2. Uninstall previous versions of this bridge using WeiDU **before replacing its files**.
-3. Extract this package into the game directory alongside `chitin.key`.
-4. Run `setup-scs-infinity-bridge` and select components individually.
-5. Start with component 0 and confirm character creation, inventory and record displays before enabling other components.
-6. Install the bridge last among mods that change these UI resources.
+1. Install **Infinity UI++**, then **SCS**. Install this bridge **after both**, and after other UI-changing mods.
+2. Uninstall any earlier bridge version with WeiDU before replacing its files.
+3. Extract the release into your game's main directory (the folder containing `chitin.key`). Keep the `scs-infinity-bridge` folder intact.
+4. Run `setup-scs-infinity-bridge.exe` and select the components you need. If the release does not contain an installer executable, copy a working WeiDU `setup-*.exe` in the game directory and rename the **copy** to `setup-scs-infinity-bridge.exe`.
+5. To diagnose issues, install components **individually**. Start with **0**, test the affected menus, then add the others as needed.
 
-WeiDU handles backups and per-component uninstallation. Components 10 and 20 have not been runtime-verified in BGEE and should be tested on backed-up installations.
+The installer checks for **both Infinity UI++ and SCS**. Feature-specific components also check that the relevant SCS feature is installed. WeiDU supports uninstalling each component independently.
+
+## Bug reports
+
+Report issues at **https://github.com/geoffreygrundycreates/scs-infinity-bridge/issues**.
+
+Include the game, Infinity UI++ and SCS versions, installed bridge component numbers, a short description of the affected screen, steps to reproduce, and any startup error text. Attach `WeiDU.log` and a screenshot if relevant.
